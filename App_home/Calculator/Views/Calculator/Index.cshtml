@@ -1,23 +1,109 @@
 ﻿@{
-    ViewData["Title"] = "Simple Calculator";
+    ViewData["Title"] = "Калькулятор";
 }
 
-<h2>@ViewData["Title"]</h2>
+<style>
+    .calc-container {
+        max-width: 480px;
+        margin: 40px auto;
+        padding: 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        color: #fff;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    .calc-container h2 {
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 28px;
+        letter-spacing: 1px;
+    }
+    .calc-container p {
+        text-align: center;
+        opacity: 0.85;
+        margin-bottom: 25px;
+        font-size: 14px;
+    }
+    .calc-form label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 500;
+        font-size: 14px;
+    }
+    .calc-form input[type="text"],
+    .calc-form select {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        margin-bottom: 18px;
+        box-sizing: border-box;
+        background: rgba(255,255,255,0.9);
+        color: #333;
+    }
+    .calc-form input[type="text"]:focus,
+    .calc-form select:focus {
+        outline: 2px solid #ffd166;
+    }
+    .calc-form input[type="submit"] {
+        width: 100%;
+        padding: 14px;
+        background: #ffd166;
+        color: #333;
+        font-size: 18px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .calc-form input[type="submit"]:hover {
+        background: #ffb703;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    }
+    .result-box {
+        margin-top: 25px;
+        padding: 20px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 10px;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+</style>
 
-<form method="post" asp-controller="Calculator" asp-action="Calculate">
-    @Html.AntiForgeryToken()
-    <input type="text" name="num1" required />
-    <select name="operation" required>
-        <option value="Add">+</option>
-        <option value="Subtract">-</option>
-        <option value="Multiply">*</option>
-        <option value="Divide">/</option>
-    </select>
-    <input type="text" name="num2" required />
-    <input type="submit" value="Calculate" />
-</form>
+<div class="calc-container">
+    <h2>Калькулятор</h2>
+    <p>Введите два числа и выберите операцию</p>
 
-@if (ViewBag.Result != null)
-{
-    <h3>Result: @ViewBag.Result</h3>
-}
+    <form method="post" asp-controller="Calculator" asp-action="Calculate" class="calc-form">
+        @Html.AntiForgeryToken()
+
+        <label>Первое число:</label>
+        <input type="text" name="num1" required />
+
+        <label>Операция:</label>
+        <select name="operation" required>
+            <option value="Add">Сложение (+)</option>
+            <option value="Subtract">Вычитание (−)</option>
+            <option value="Multiply">Умножение (×)</option>
+            <option value="Divide">Деление (÷)</option>
+        </select>
+
+        <label>Второе число:</label>
+        <input type="text" name="num2" required />
+
+        <input type="submit" value="Вычислить" />
+    </form>
+
+    @if (ViewBag.Result != null)
+    {
+        <div class="result-box">
+            Результат: @ViewBag.Result
+        </div>
+    }
+</div>
