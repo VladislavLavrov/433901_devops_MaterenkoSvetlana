@@ -35,10 +35,10 @@
         <input type="submit" value="Вычислить" />
     </form>
 
-    @if (ViewBag.LastResult != null)
+    @if (ViewBag.Result != null)
     {
         <div class="result-box">
-            Результат: @ViewBag.LastResult
+            @ViewBag.Result
         </div>
     }
 </div>
