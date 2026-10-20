@@ -12,8 +12,7 @@ namespace Calculator.Services
         {
             var producerConfig = new ProducerConfig
             {
-                BootstrapServers = config["Kafka:ProducerSettings:BootstrapServers"],
-                SecurityProtocol = SecurityProtocol.Ssl
+                BootstrapServers = config["Kafka:ProducerSettings:BootstrapServers"]
             };
 
             kafkaHandle = new ProducerBuilder<K, V>(producerConfig).Build();
