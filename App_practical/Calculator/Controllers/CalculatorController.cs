@@ -1,17 +1,23 @@
 ﻿using Calculator.Data;
+using Calculator.Models;
+using Calculator.Services;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace Calculator.Controllers
 {
-    public enum Operation { Add, Subtract, Multiply, Divide }
-
     public class CalculatorController : Controller
     {
-        private CalculatorContext _context;
+        private readonly CalculatorContext _context;
+        private readonly KafkaProducerService<Null, string> _producer;
 
-        public CalculatorController(CalculatorContext context)
+        public CalculatorController(
+            CalculatorContext context,
+            KafkaProducerService<Null, string> producer)
         {
             _context = context;
+            _producer = producer;
         }
 
         [HttpGet]
@@ -22,38 +28,19 @@ namespace Calculator.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Calculate(double num1, double num2, Operation operation)
+        public async Task<IActionResult> Calculate(double num1, double num2, Operation operation)
         {
-            double result = 0;
-            switch (operation)
-            {
-                case Operation.Add:
-                    result = num1 + num2;
-                    break;
-                case Operation.Subtract:
-                    result = num1 - num2;
-                    break;
-                case Operation.Multiply:
-                    result = num1 * num2;
-                    break;
-                case Operation.Divide:
-                    result = num1 / num2;
-                    break;
-            }
-
-            ViewBag.Result = result;
-
             var dataInputVariant = new DataInputVariant
             {
-                Operand_1 = num1.ToString(),
-                Operand_2 = num2.ToString(),
-                Type_operation = operation.ToString(),
-                Result = result.ToString()
+                Operand_1 = num1,
+                Operand_2 = num2,
+                Type_operation = operation
             };
 
-            _context.DataInputVariants.Add(dataInputVariant);
-            _context.SaveChanges();
+            var json = JsonSerializer.Serialize(dataInputVariant);
+            await _producer.ProduceAsync("materenko", new Message<Null, string> { Value = json });
 
+            ViewBag.Result = "Отправлено в Kafka. Результат появится в базе после обработки.";
             return View("Index");
         }
     }

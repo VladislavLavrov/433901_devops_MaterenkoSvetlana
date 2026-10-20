@@ -11,9 +11,55 @@ services:
       MARIADB_PASSWORD: password
     ports:
       - "0.0.0.0:5093:3306"
+    networks:
+      - app-net
+
   web:
     container_name: web-app-calculator-9
     hostname: app
     build: Calculator/
     ports:
       - "0.0.0.0:5009:5009"
+    depends_on:
+      - mariadb
+    networks:
+      - app-net
+
+  kafka:
+    container_name: kafka-materenko
+    image: apache/kafka:3.9.1
+    restart: always
+    ports:
+      - "0.0.0.0:9094:9094"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,EXTERNAL://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://93.88.178.186:9094
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - app-net
+
+  kafka-ui:
+    container_name: kafka-ui-materenko
+    image: provectuslabs/kafka-ui:latest
+    restart: always
+    ports:
+      - "0.0.0.0:10025:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      - kafka
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    name: app-net
