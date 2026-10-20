@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,15 +16,12 @@ namespace Calculator.Services
         private readonly string _topic;
         private readonly IConsumer<Null, string> _kafkaConsumer;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IHttpClientFactory _clientFactory;
 
         public KafkaConsumerService(
             IConfiguration config,
-            IServiceProvider serviceProvider,
-            IHttpClientFactory clientFactory)
+            IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _clientFactory = clientFactory;
 
             var consumerConfig = new ConsumerConfig
             {
@@ -41,7 +37,15 @@ namespace Calculator.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _kafkaConsumer.Subscribe(_topic);
+            try
+            {
+                _kafkaConsumer.Subscribe(_topic);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка подписки на Kafka: {ex.Message}");
+                return;
+            }
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -65,13 +69,13 @@ namespace Calculator.Services
                 {
                     break;
                 }
-                catch (ConsumeException)
+                catch (ConsumeException ex)
                 {
-                    break;
+                    Console.WriteLine($"Ошибка Consume: {ex.Error.Reason}");
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // Ошибку логируем, но не роняем сервис
+                    Console.WriteLine($"Ошибка обработки: {ex.Message}");
                 }
             }
         }
