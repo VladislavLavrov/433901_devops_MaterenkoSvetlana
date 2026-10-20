@@ -28,7 +28,8 @@ namespace Calculator.Services
                 BootstrapServers = config["Kafka:ConsumerSettings:BootstrapServers"],
                 GroupId = config["Kafka:ConsumerSettings:GroupId"],
                 AutoOffsetReset = AutoOffsetReset.Earliest,
-                EnableAutoCommit = true
+                EnableAutoCommit = true,
+                SecurityProtocol = SecurityProtocol.Ssl
             };
 
             _topic = config["Kafka:TopicName"];
