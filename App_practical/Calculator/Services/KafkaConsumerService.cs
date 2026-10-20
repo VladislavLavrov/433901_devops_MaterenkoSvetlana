@@ -37,6 +37,9 @@ namespace Calculator.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            // Не блокируем старт приложения
+            await Task.Yield();
+
             try
             {
                 _kafkaConsumer.Subscribe(_topic);
