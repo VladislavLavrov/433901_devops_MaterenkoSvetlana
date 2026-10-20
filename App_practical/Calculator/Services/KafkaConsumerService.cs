@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,12 +18,15 @@ namespace Calculator.Services
         private readonly string _topic;
         private readonly IConsumer<Null, string> _kafkaConsumer;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IHttpClientFactory _clientFactory;
 
         public KafkaConsumerService(
             IConfiguration config,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            IHttpClientFactory clientFactory)
         {
             _serviceProvider = serviceProvider;
+            _clientFactory = clientFactory;
 
             var consumerConfig = new ConsumerConfig
             {
@@ -37,7 +42,6 @@ namespace Calculator.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            // Не блокируем старт приложения
             await Task.Yield();
 
             try

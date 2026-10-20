@@ -23,11 +23,14 @@ namespace Calculator.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            var last = _context.DataInputVariants
+                .OrderByDescending(x => x.ID_DataInputVariant)
+                .FirstOrDefault();
+            ViewBag.LastResult = last?.Result;
             return View();
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Calculate(double num1, double num2, Operation operation)
         {
             var dataInputVariant = new DataInputVariant
@@ -40,8 +43,23 @@ namespace Calculator.Controllers
             var json = JsonSerializer.Serialize(dataInputVariant);
             await _producer.ProduceAsync("materenko", new Message<Null, string> { Value = json });
 
-            ViewBag.Result = "Отправлено в Kafka. Результат появится в базе после обработки.";
-            return View("Index");
+           
+            await Task.Delay(1000);
+
+            
+            return RedirectToAction(nameof(Index));
+        }
+
+        
+        [HttpPost]
+        public IActionResult Callback([FromBody] DataInputVariant inputData)
+        {
+            if (inputData != null)
+            {
+                _context.DataInputVariants.Add(inputData);
+                _context.SaveChanges();
+            }
+            return Ok();
         }
     }
 }
