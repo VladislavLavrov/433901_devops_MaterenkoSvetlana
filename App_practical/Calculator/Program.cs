@@ -16,7 +16,7 @@ builder.Services.AddDbContext<CalculatorContext>(options =>
 
 builder.Services.AddHttpClient();
 
-//builder.Services.AddHostedService<KafkaConsumerService>();
+builder.Services.AddHostedService<KafkaConsumerService>();
 builder.Services.AddSingleton<KafkaProducerHandler>();
 builder.Services.AddSingleton<KafkaProducerService<Null, string>>();
 
