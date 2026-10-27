@@ -8,13 +8,13 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh 'ls -l'
-                sh 'docker compose build'
+                sh 'cd App_practical && ls -l'
+                sh 'cd App_practical && docker compose build'
             }
         }
         stage('Start Docker Container') {
             steps {
-                sh 'docker compose up -d'
+                sh 'cd App_practical && docker compose up -d'
             }
         }
     }
