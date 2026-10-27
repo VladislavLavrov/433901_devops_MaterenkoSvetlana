@@ -5,3 +5,13 @@ services:
     build: Calculator/
     ports:
       - "0.0.0.0:5219:5009"
+    networks:
+      - app-net-jenkins
+
+networks:
+  app-net-jenkins:
+    name: app-net-jenkins
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.98.0.0/24
