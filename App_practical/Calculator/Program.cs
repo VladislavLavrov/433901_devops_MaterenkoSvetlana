@@ -16,18 +16,13 @@ builder.Services.AddDbContext<CalculatorContext>(options =>
 builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics =>
     {
+        metrics.AddAspNetCoreInstrumentation();
         metrics.AddPrometheusExporter();
     });
 
 var app = builder.Build();
 
 app.MapPrometheusScrapingEndpoint();
-
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
 
 app.UseStaticFiles();
 app.UseRouting();
