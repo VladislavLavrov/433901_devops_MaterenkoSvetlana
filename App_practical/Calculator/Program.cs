@@ -1,5 +1,6 @@
 using Calculator.Data;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Metrics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,9 +13,15 @@ builder.Services.AddDbContext<CalculatorContext>(options =>
     options.UseMySql(mariadbcs, new MySqlServerVersion(new Version(10, 5, 15)));
 });
 
-builder.Services.AddRazorPages();
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(metrics =>
+    {
+        metrics.AddPrometheusExporter();
+    });
 
 var app = builder.Build();
+
+app.MapPrometheusScrapingEndpoint();
 
 if (!app.Environment.IsDevelopment())
 {

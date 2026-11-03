@@ -1,0 +1,35 @@
+services:
+  web:
+    container_name: web-app-monitoring-9
+    hostname: app
+    build: Calculator/
+    ports:
+      - "0.0.0.0:5019:5009"
+    networks:
+      - app-net-monitoring
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-9
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "0.0.0.0:9099:9090"
+    networks:
+      - app-net-monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-9
+    ports:
+      - "0.0.0.0:3019:3000"
+    networks:
+      - app-net-monitoring
+
+networks:
+  app-net-monitoring:
+    name: app-net-monitoring
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.96.0.0/24
