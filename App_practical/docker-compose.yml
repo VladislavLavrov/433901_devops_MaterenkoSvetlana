@@ -14,7 +14,7 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "0.0.0.0:9099:9090"
+      - "0.0.0.0:9199:9090"
     networks:
       - app-net-monitoring
 
