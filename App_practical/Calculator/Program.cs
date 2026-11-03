@@ -24,6 +24,12 @@ var app = builder.Build();
 
 app.MapPrometheusScrapingEndpoint();
 
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
