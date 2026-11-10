@@ -22,8 +22,6 @@ builder.Services.AddOpenTelemetry()
 
 var app = builder.Build();
 
-app.MapPrometheusScrapingEndpoint();
-
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -33,6 +31,8 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
+
+app.MapPrometheusScrapingEndpoint();
 
 app.MapControllerRoute(
     name: "default",
