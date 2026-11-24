@@ -1,7 +1,6 @@
 services:
   web:
     container_name: web-app-monitoring-9
-    hostname: app
     build: Calculator/
     ports:
       - "0.0.0.0:5109:5009"

@@ -1,41 +1,41 @@
-using Calculator.Data;
-using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-string mariadbcs = builder.Configuration.GetConnectionString("DefaultConnection");
-
-builder.Services.AddDbContext<CalculatorContext>(options =>
-{
-    options.UseMySql(mariadbcs, new MySqlServerVersion(new Version(10, 5, 15)));
-});
-
 builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics =>
     {
-        metrics.AddAspNetCoreInstrumentation();
         metrics.AddPrometheusExporter();
+        metrics.AddMeter(
+            "Microsoft.AspNetCore.Hosting",
+            "Microsoft.AspNetCore.Server.Kestrel",
+            "Microsoft.AspNetCore.Http.Connections");
+        metrics.AddView("http.server.request.duration",
+            new ExplicitBucketHistogramConfiguration
+            {
+                Boundaries = new double[]
+                {
+                    0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1,
+                    0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10
+                }
+            });
     });
 
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    app.UseExceptionHandler("/Calculator/Error");
 }
 
 app.UseStaticFiles();
 app.UseRouting();
-app.UseAuthorization();
+app.MapPrometheusScrapingEndpoint();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Calculator}/{action=Index}/{id?}");
-
-app.MapPrometheusScrapingEndpoint();
 
 app.Run();
