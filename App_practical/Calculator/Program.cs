@@ -32,10 +32,10 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 
-app.MapPrometheusScrapingEndpoint();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Calculator}/{action=Index}/{id?}");
+
+app.MapPrometheusScrapingEndpoint();
 
 app.Run();
