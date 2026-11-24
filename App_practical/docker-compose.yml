@@ -4,7 +4,7 @@ services:
     hostname: app
     build: Calculator/
     ports:
-      - "0.0.0.0:5019:5009"
+      - "0.0.0.0:5109:5009"
     networks:
       - app-net-monitoring
 
